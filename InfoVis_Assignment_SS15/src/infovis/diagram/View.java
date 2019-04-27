@@ -9,8 +9,10 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
-import javax.swing.JPanel;
+import java.awt.BasicStroke;
+import java.awt.Stroke;
 
+import javax.swing.JPanel;
 
 
 public class View extends JPanel{
@@ -20,8 +22,16 @@ public class View extends JPanel{
 	private double translateX= 0;
 	private double translateY=0;
 	private Rectangle2D marker = new Rectangle2D.Double();
-	private Rectangle2D overviewRect = new Rectangle2D.Double();   
-
+	private double markerOffset = 0;
+	private double markerSizeX;
+	private double markerSizeY;
+	Color markerColor = new Color(150, 150, 150, 127);
+	private Rectangle2D overviewRect = new Rectangle2D.Double();
+	private double overviewScale = 0.2;
+	private double overviewInitPos = 50;
+	private double overviewSizeX;
+	private double overviewSizeY;
+	
 	public Model getModel() {
 		return model;
 	}
@@ -41,15 +51,33 @@ public class View extends JPanel{
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 		g2D.clearRect(0, 0, getWidth(), getHeight());
-		
-		
-		
+		g2D.scale(scale, scale);
 		paintDiagram(g2D);
 		
+		// Overview rectangle
+		overviewScale = 0.2/scale;
+		overviewSizeX = getWidth();
+		overviewSizeY = getHeight();
 		
+		Graphics2D overview = (Graphics2D) g;
+		overview.scale(overviewScale, overviewScale);
+		overviewRect = new Rectangle2D.Double(0, 0, overviewSizeX, overviewSizeY);
+		overview.setColor(Color.darkGray);
+		overview.translate(overviewInitPos, overviewInitPos);
+		overview.draw(overviewRect);
+		paintDiagram(overview);
 		
+		// Marker rectangle
+		markerSizeX = getWidth()/scale;
+		markerSizeY = getHeight()/scale;
 		
+		Graphics2D markerView = (Graphics2D) g;
+		marker = new Rectangle2D.Double(markerOffset, markerOffset, markerSizeX, markerSizeY);
+		markerView.setColor(markerColor);
+		markerView.fill(marker);
+		markerView.draw(marker);
 	}
+	
 	private void paintDiagram(Graphics2D g2D){
 		for (Element element: model.getElements()){
 			element.paint(g2D);
