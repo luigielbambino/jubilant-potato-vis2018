@@ -13,12 +13,12 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	private ArrayList<Data> rectangleData  = new ArrayList<Data>();
 	private int x = 0;
 	private int y = 0;
-	private markerX = 0;
-	private markerY = 0;
-	private initX = 0;
-	private initY = 0;
-	private currentX = 0;
-	private currentY = 0;
+	private int markerX = 0;
+	private int markerY = 0;
+	private int initX = 0;
+	private int initY = 0;
+	private int currentX = 0;
+	private int currentY = 0;
 	private double mouseX  = 0;
 	private double mouseY  = 0;
 

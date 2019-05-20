@@ -1,4 +1,4 @@
-package infovis.diagram;
+ package infovis.diagram;
 
 import infovis.debug.Debug;
 import infovis.diagram.elements.DrawingEdge;
@@ -8,6 +8,7 @@ import infovis.diagram.elements.GroupingRectangle;
 import infovis.diagram.elements.None;
 import infovis.diagram.elements.Vertex;
 import infovis.diagram.layout.Fisheye;
+import java.awt.geom.Rectangle2D;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
@@ -27,6 +28,13 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	 private DrawingEdge drawingEdge = null;
 	 private boolean fisheyeMode;
 	 private GroupingRectangle groupRectangle;
+	 
+	 private boolean hitOverview = false; // overview
+	 private boolean hitMarker = false; // marker
+	 
+	 private Fisheye fisheye = new Fisheye(); // fisheye
+	 private Model fishModel; //fisheye
+	 
 	/*
 	 * Getter And Setter
 	 */
@@ -92,7 +100,28 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		int y = e.getY();
 		double scale = view.getScale();
 		
-	   
+		int xOver=(int) (view.overviewX * view.overviewScale * scale);
+		int yOver=(int) (view.overviewY * view.overviewScale * scale);
+		int wOver=(int) (view.overviewWidth * view.overviewScale * scale);
+		int hOver=(int) (view.overviewHeight * view.overviewScale * scale);
+		
+		int xMark=(int) (view.markerX * view.overviewScale * scale);
+		int yMark=(int) (view.markerY * view.overviewScale * scale);
+		int wMark=(int) (view.markerWidth * view.overviewScale * scale);
+		int hMark=(int) (view.markerHeight * view.overviewScale * scale);
+		
+		if(x>xOver && x<xOver+wOver && y>yOver && y<yOver+hOver){
+			hitOverview=true;
+		}
+		
+		if(x>xMark && x<xMark+wMark && y>yMark && y<yMark+hMark){
+			hitMarker=true;
+			System.out.println("hitMarker: " + hitMarker);
+		}
+		
+		System.out.println("marker: " + xMark + "-" + yMark +"-" + wMark + "-" + hMark);
+		
+		
 	   if (edgeDrawMode){
 			drawingEdge = new DrawingEdge((Vertex)getElementContainingPosition(x/scale,y/scale));
 			model.addElement(drawingEdge);
@@ -115,6 +144,9 @@ public class MouseController implements MouseListener,MouseMotionListener {
 	public void mouseReleased(MouseEvent arg0){
 		int x = arg0.getX();
 		int y = arg0.getY();
+		
+		hitOverview=false; // overview
+		hitMarker=false; // marker
 		
 		if (drawingEdge != null){
 			Element to = getElementContainingPosition(x, y);
@@ -168,6 +200,17 @@ public class MouseController implements MouseListener,MouseMotionListener {
 		int x = e.getX();
 		int y = e.getY();
 		double scale = view.getScale();
+		
+		if(hitMarker==true){
+			hitOverview=false;
+			view.updateMarker(x, y);
+			view.updateTranslation(x, y);
+		}
+		
+		if(hitOverview==true){
+			view.updateOverview(x, y);
+		}
+		
 		/*
 		 * Aufgabe 1.2
 		 */
@@ -175,6 +218,14 @@ public class MouseController implements MouseListener,MouseMotionListener {
 			/*
 			 * handle fisheye mode interactions
 			 */
+			fisheye.setMouseCoords(x, y, view); // Fisheye. Normal coords
+			fishModel=new Model();
+			for(int i=0;i<model.getVertices().size();i++){
+				fishModel.addVertex(new Vertex(model.getVertices().get(i)));
+			}
+			fishModel=fisheye.transform(fishModel, view);
+			view.setModel(fishModel);
+			
 			view.repaint();
 		} else if (edgeDrawMode){
 			drawingEdge.setX(e.getX());
