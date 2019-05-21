@@ -4,6 +4,7 @@ import infovis.scatterplot.Data;
 import infovis.scatterplot.Model;
 import infovis.scatterplot.Range;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,78 +13,130 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Random;
-
+import java.awt.Shape;
 import javax.swing.JPanel;
 
 public class View extends JPanel {
+	
+	public int xOffset = 100;
+	private int yOffset = 80;
+	public int distance = 100;
+	public int xInitPos = 0;
+	public int xEndPos = 0;
+	public int newX = 0;
+	public int pInitX = 0;
+	public int pInitY = 0;
+	public int pEndX = 0;
+	public int pEndY = 0;
+	public int[] order = new int[] { 0, 1, 2, 3, 4, 5, 6 };
+	public int moveAxis = -2;
+	public ArrayList<Integer> list = new ArrayList<Integer>();
 	private Model model = null;
-	private static final Data Null = null;
-	private Line2D.Double parallelLine = new Line2D.Double(100, 100, 100, 600);
-	private Line2D.Double dLine = new Line2D.Double(0, 0, 0, 0);
-	private Rectangle2D markerRectangle = new Rectangle2D.Double(0, 0, 0, 0);
-	private int markerWidth = 0;
-	private int markerHeight = 0;
-	private int mouseX = 0;
-	private int mouseY = 0;
-	private ArrayList<Data> dAttributes = new ArrayList<Data>();
-	private double x1 = 100;
-	private double y1 = 100;
-	private double x2 = x1;
-	private double y2 = 500;
-	private boolean reset = true;
-	private ArrayList<Data> dList = new ArrayList<Data>();
-	private double [][] dValues;
-	private boolean drawLines;
+	public boolean init = true;
+	private int length = 400;
+	private int border = 5;
+	private Line2D.Double line;	
 
 	@Override
 	public void paint(Graphics g) {
+		
 		Graphics2D g2D = (Graphics2D) g;
-		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2D.clearRect(0, 0, getWidth(), getHeight());
-
-		if(drawLines == true) {
-			makeLines();
-			drawLines = false;
-		}
-
-		markerRectangle.setRect(mouseX, mouseY, markerWidth, markerHeight);
-		Color color = Color.GRAY;
-		Color c = null;
-		g2D.setColor(c);
-		g2D.draw(markerRectangle);
-
-		if(reset) {
-			makeAttributes();
-			reset = false;
-		}
-		for(int j = 0; j < dAttributes.size(); j++) {
-			Data newData = null;
-			newData = this.dAttributes.get(j);
-			String label = newData.getLabel();
-			int strX = (int)(newData.getLine().getX1());
-			int strY = (int)(newData.getLine().getY1());
-			g2D.setColor(Color.BLUE);
-        	g2D.drawString(label, strX-20, strY);
-        	g2D.setColor(newData.getColor());
-			g2D.draw(newData.getLine());
-		}
-		Data newd = Null;
-		for (int i = 0; i < dList.size(); i++) {
-			newd = dList.get(i);
-			dValues = newd.getXY();
-			double pX1 = 0;
-			double pX2 = 0;
-			double pY1 = 0;
-			double pY2 = 0;
-			for(int j = 0; j < model.getDim() - 1; j++) {
-				pX1 = dValues[j][0];
-				pY1 = dValues[j][1] + 100;
-				pX2 = dValues[j + 1][0];
-				pY2 = dValues[j + 1][1] + 100;
-				dLine.setLine(pX1, pY1, pX2, pY2);
-				g2D.setColor(newd.getColor());
-				g2D.draw(dLine);
+		
+		if (init == true) {
+			for (int i = 0; i < order.length; i++) {
+				list.add(order[i]);
 			}
+			init = false;
+		}
+		
+		if(moveAxis==-1){
+			for (int i = 0; i < model.getLabels().size(); i++) {
+				g2D.setStroke(new BasicStroke(3));
+				g2D.setColor(Color.darkGray);
+				g.drawLine(xOffset + i * distance, yOffset, xOffset + i * distance, yOffset + length);
+			}
+		}else{
+			for (int i = 0; i < model.getLabels().size(); i++) {
+				g2D.setStroke(new BasicStroke(3));
+				if (list.get(i)==moveAxis) {
+					g2D.setColor(Color.blue);
+					g.drawLine(newX, yOffset, newX, yOffset + length);
+				} else {
+					g2D.setColor(Color.darkGray);
+					g.drawLine(xOffset + i * distance, yOffset, xOffset + i * distance, yOffset + length);
+				}
+			}
+		}
+		
+		if(moveAxis==-1){
+			for (int i = 0; i < model.getLabels().size(); i++) {
+				int width = g.getFontMetrics().stringWidth(model.getLabels().get(list.get(i)));
+				g2D.setColor(Color.darkGray);
+				g.drawString(model.getLabels().get(list.get(i)), i * distance + xOffset - width / 2, 60);
+			}
+		}else{
+			for (int i = 0; i < model.getLabels().size(); i++) {
+				int width = g.getFontMetrics().stringWidth(model.getLabels().get(list.get(i)));
+				g2D.setStroke(new BasicStroke(3));
+				if (list.get(i)==moveAxis) {
+				g2D.setColor(Color.blue);
+					g.drawString(model.getLabels().get(list.get(i)), newX - width / 2, 60);
+				} else {
+					g2D.setColor(Color.darkGray);
+					g.drawString(model.getLabels().get(list.get(i)), i * distance + xOffset - width / 2, 60);
+				}
+			}
+		}
+		
+		for (int i = 0; i < model.getList().size(); i++) {
+
+			double x1 = 0, y1 = 0;
+			double xPoint[] = new double[model.getLabels().size()];
+			double yPoint[] = new double[model.getLabels().size()];
+
+			boolean check = false;
+			for (int j = 0; j < model.getLabels().size(); j++) {
+				double rangeLow = model.getRanges().get(list.get(j)).getMin();
+				double rangeHigh = model.getRanges().get(list.get(j)).getMax();
+				double initValue = model.getList().get(i).getValue(list.get(j));
+
+				y1 = yOffset + (length - border)
+						- (length - 2 * border) * (initValue - rangeLow) / (rangeHigh - rangeLow);
+				
+				if (list.get(j) == moveAxis) {
+					x1 = newX;
+				} else {
+					x1 = xOffset + j * distance;
+				}
+
+				xPoint[j] = x1;
+				yPoint[j] = y1;
+			}
+			for (int j = 0; j < model.getLabels().size() - 1; j++) {
+				line = new Line2D.Double(xPoint[j], yPoint[j], xPoint[j + 1], yPoint[j + 1]);
+				if (line.intersectsLine(pInitX, pInitY, pEndX, pEndY)
+						|| line.intersectsLine(pInitX, pEndY, pEndX, pInitY)) {
+					check = true;
+				}
+			}
+			if (check == true) {
+				for (int j = 0; j < model.getLabels().size() - 1; j++) {
+					line = new Line2D.Double(xPoint[j], yPoint[j], xPoint[j + 1], yPoint[j + 1]);
+					g2D.setColor(Color.green);
+					g2D.setStroke(new BasicStroke(1));
+					g2D.draw(line);
+				}
+			} else {
+				for (int j = 0; j < model.getLabels().size() - 1; j++) {
+					line = new Line2D.Double(xPoint[j], yPoint[j], xPoint[j + 1], yPoint[j + 1]);
+					g2D.setColor(Color.darkGray);
+					g2D.setStroke(new BasicStroke(1));
+					g2D.draw(line);
+				}
+			}
+
 		}
 	}
 
@@ -98,71 +151,6 @@ public class View extends JPanel {
 
 	public void setModel(Model model) {
 		this.model = model;
-	}
-
-	public void makeLines() {
-		ArrayList<Range> range = model.getRanges();
-		for(Data d : model.getList()) {
-			double x1Line = 100;
-			double dValues[][] = new double[d.getValues().length][d.getValues().length];
-			int dataID = d.getID();
-			String dLabel = d.getLabel();
-
-			for(int i = 0; i < model.getDim(); i++) {
-				double max = range.get(i).getMax();
-				double min = range.get(i).getMin();
-				double vi = ((d.getValue(i) - min)) / (max - min);
-				double yP = (vi) * (2800) / (model.getDim());
-				double xP = x1Line;
-				dValues[i][0] = xP;
-				dValues[i][1] = yP;
-				x1Line += 100;
-			}
-			dList.add(new Data(dValues, dataID, dLabel));
-		}
-	}
-
-	public Rectangle2D getMarkerRectangle() {
-		return markerRectangle;
-	}
-
-	public void setMarkerDimension(int h, int w) {
-		this.markerHeight = h;
-		this.markerWidth = w;
-	}
-
-	public void setMarker (int x, int y) {
-		this.mouseX = x;
-		this.mouseY = y;
-	}
-
-	public void drawLines(boolean b) {
-		this.drawLines = b;
-	}
-
-	public void makeAttributes() {
-		for(String l : model.getLabels()) {
-			x2 = x1;
-			int dataID = Model.generateNewID();
-			dAttributes.add(new Data(dataID, x1, y1, x2, y2, l));
-			x1 += 100;
-		}
-	}
-
-	public void setLine(double x) {
-		x1 = x;
-	}
-
-	public ArrayList<Data> getDataAttribute() {
-		return dAttributes;
-	}
-
-	public ArrayList<Data> getDataList() {
-		return dList;
-	}
-
-	public double[][] getDataValues() {
-		return dValues;
 	}
 	
 }
