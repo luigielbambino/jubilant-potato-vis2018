@@ -14,96 +14,85 @@ import java.util.Iterator;
 
 public class Fisheye implements Layout{
 	
-	public int focusX;
-	public int focusY;
+	public int pFocusX;
+	public int pFocusY;
 	
 
 	public void setMouseCoords(int x, int y, View view) {
 		// TODO Auto-generated method stub
-		focusX=(int)(x/view.getScale()-view.getTranslateX());
-		focusY=(int)(y/view.getScale()-view.getTranslateY());
+		
+		// get focus
+		pFocusX=(int)(x / view.getScale() - view.getTranslateX()); // Focus point in X
+		pFocusY=(int)(y / view.getScale() - view.getTranslateY()); // Focus point in Y
 	}
 
 	public Model transform(Model model, View view) {
 		// TODO Auto-generated method stub
 		
-		double dMaxX, dMaxY, dNormX, dNormY, dNorX,dNorY;
-		double fishX,fishY;
-		int d=2;
-		int boundaryX=view.getWidth();
-		int boundaryY=view.getHeight();	
-		//System.out.println(boundaryX+"+"+boundaryY);
+		double dNormX, dNormY, dMaxX, dMaxY, qNormX, qNormY; // normal  coordinates and distance from focus to border of the window
+		double pfyeX,pfyeY, gpx, gpy, sGeomX, sGeomY, qFishX, qFishY, sFishX, sFishY; // fisheye coordinates, 
 		
-		int length=model.getVertices().size();
+		int d = 2; // distortion factor
+		int ratio = 3;
+		
+		int windowWith = view.getWidth(); // Boundary in X
+		int windowHeight = view.getHeight(); // Boundary in Y
+		
+		int length  =  model.getVertices().size(); 
 		for(int i=0; i<length;i++){
 			
-			double width=60;
-			double height=20;
-
+			double sNormX = 40; // vertex width
+			double sNormY = sNormX / ratio; // vertex height
+			double initX = model.getVertices().get(i).getCenterX();
+			double initY = model.getVertices().get(i).getCenterY();
 			
-			double oldX=model.getVertices().get(i) .getCenterX();
-			double oldY=model.getVertices().get(i).getCenterY();
+			// mapping position
+			if(initX > pFocusX){dMaxX = windowWith - pFocusX;
+			}else{dMaxX = 0 - pFocusX;}
+			if(initY > pFocusY){dMaxY = windowHeight - pFocusY;
+			}else{ dMaxY = 0 - pFocusY;}
 			
-			if(oldX>focusX){
-				dMaxX=boundaryX-focusX;
+			dNormX = initX - pFocusX;
+			dNormY = initY - pFocusY;
+			gpx = (d + 1) * (dNormX / dMaxX) / (d * (dNormX / dMaxX) + 1);
+			gpy = (d + 1) * (dNormY / dMaxY) / (d * (dNormY / dMaxY) + 1);
+			pfyeX = gpx * dMaxX + pFocusX;
+			pfyeY = gpy * dMaxY + pFocusX ;
+			
+			qNormX = initX + sNormX / 2;
+			qNormY = initY + sNormY / 2;
+			if(qNormX > pFocusX){dMaxX = windowWith - pFocusX;
+			}else{dMaxX = -pFocusX;}
+			if(qNormY > pFocusY){dMaxY = windowHeight - pFocusY;
+			}else{dMaxY = -pFocusY;}
+			
+			dNormX = qNormX - pFocusX;
+			dNormY = qNormY - pFocusY;
+			
+			
+			// Mapping size
+			qFishX = pFocusX + dMaxX * (d+1) * (dNormX/dMaxX) / (d * (dNormX/dMaxX) + 1);
+			qFishY = pFocusX + dMaxY * (d+1) * (dNormY/dMaxY) / (d * (dNormY/dMaxY) + 1);
+			sGeomX = 2 * (int)(qFishX - pfyeX);
+			sGeomY = 2 * (int)(qFishY - pfyeY);
+			
+			// assign sFish according to ratio
+			if(sGeomX < sGeomY){
+				sFishX = sGeomX;
+				sFishY = sGeomX / ratio;
 			}else{
-				dMaxX=0-focusX;
-			}
-			dNormX=oldX-focusX;
-			
-			if(oldY>focusY){
-				dMaxY=boundaryY-focusY;
-			}else{ 
-				dMaxY=0-focusY;
-			}
-			dNormY=oldY-focusY;
-		
-			fishX=focusX+dMaxX*(d+1)*(dNormX/dMaxX)/(d*(dNormX/dMaxX)+1);
-			fishY=focusY+dMaxY*(d+1)*(dNormY/dMaxY)/(d*(dNormY/dMaxY)+1);
-			
-			double qNormX=oldX+width/2;
-			double qNormY=oldY+height/2;
-			
-			if(qNormX>focusX){
-				dMaxX=boundaryX-focusX;
-			}else{
-				dMaxX=0-focusX;
-			}
-			dNormX=qNormX-focusX;
-			
-			if(qNormY>focusY){
-				dMaxY=boundaryY-focusY;
-			}else{ 
-				dMaxY=0-focusY;
-			}
-			dNormY=qNormY-focusY;
-			
-			double qfishX=focusX+dMaxX*(d+1)*(dNormX/dMaxX)/(d*(dNormX/dMaxX)+1);
-			double qfishY=focusY+dMaxY*(d+1)*(dNormY/dMaxY)/(d*(dNormY/dMaxY)+1);
-			
-			
-			double geomX=2*Math.abs(qfishX-fishX);
-			double geomY=2*Math.abs(qfishY-fishY);
-			
-			double sGeomX,sGeomY;
-			
-			if(geomX<geomY){
-				sGeomX=geomX;
-				sGeomY=geomX/3;
-			}else{
-				sGeomX=geomY*3;
-				sGeomY=geomY;
+				sFishX = sGeomY * ratio;
+				sFishY= sGeomY;
 			}
 			
-			model.getVertices().get(i).setX(fishX-0.5*sGeomX);
-			model.getVertices().get(i).setY(fishY-0.5*sGeomY);
-			model.getVertices().get(i).setWidth(sGeomX);
-			model.getVertices().get(i).setHeight(sGeomY);
-			
+			// apply distortions
+			model.getVertices().get(i).setX(pfyeX-(sFishX/2));
+			model.getVertices().get(i).setY(pfyeY-(sFishY/2));
+			model.getVertices().get(i).setWidth(sFishX);
+			model.getVertices().get(i).setHeight(sFishY);
 		}
 		
 		return model;
-		//return null;
 	}
 	
 }

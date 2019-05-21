@@ -18,21 +18,23 @@ public class View extends JPanel {
 	private double scale = 1;
 	private double translateX = 0;
 	private double translateY = 0;
+	
 	private Rectangle2D marker = new Rectangle2D.Double();
-	public Rectangle2D overviewRect = new Rectangle2D.Double();
-	public Rectangle2D overViewTop = new Rectangle2D.Double();
+	Color markerColor = new Color(0, 0, 255, 50);
+	public double markerX = 0;
+	public double markerY = 0;
+	public int markerWidth;
+	public int markerHeight;
 
-	public int overviewX = 40; // overview
-	public int overviewY = 20; // overview
+	public Rectangle2D overviewRect = new Rectangle2D.Double();
 	public double overviewScale = 4;
 	private double overViewTranslateX = 0;
 	private double overViewTranslateY = 0;
 
-	public double markerX = 0; // marker
-	public double markerY = 0; // marker
-	public int markerWidth; // marker
-	public int markerHeight; // marker
-
+	public Rectangle2D overViewTop = new Rectangle2D.Double();
+	Color topColor = new Color(100, 100, 100, 120);
+	
+	
 	public Model getModel() {
 		return model;
 	}
@@ -72,6 +74,7 @@ public class View extends JPanel {
 		double y = overviewTopY + overviewTopHeight;
 
 		overViewTop.setRect(x, overviewTopY, width, overviewTopHeight);
+		g2D.setColor(topColor);
 		g2D.fill(overViewTop);
 		g2D.draw(overViewTop);
 
@@ -103,8 +106,9 @@ public class View extends JPanel {
 		double markerX = overviewRect.getX() + differenceX;
 		double markerY = overviewRect.getY() + differenceY;
 		marker = new Rectangle2D.Double(markerX, markerY, markerWidth, markerHeight);
-		g2D.setColor(Color.MAGENTA);
+		g2D.setColor(markerColor);
 		g2D.draw(marker);
+		g2D.fill(marker);
 
 	}
 

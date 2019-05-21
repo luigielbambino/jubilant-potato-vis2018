@@ -208,6 +208,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		int x = e.getX();
 		int y = e.getY();
 		double scale = view.getScale();
+		
 		if (hitMarker || hitTopOverview) {
 			if (hitMarker) {
 				hitTopOverview = false;
@@ -230,15 +231,17 @@ public class MouseController implements MouseListener, MouseMotionListener {
 			/*
 			 * handle fisheye mode interactions
 			 */
-			fisheye.setMouseCoords(x, y, view); // Fisheye. Normal coords
+			fisheye.setMouseCoords(x, y, view); // Fisheye Focus coordinates
 			fishModel = new Model();
+			
 			for (int i = 0; i < model.getVertices().size(); i++) {
 				fishModel.addVertex(new Vertex(model.getVertices().get(i)));
 			}
+			
 			fishModel = fisheye.transform(fishModel, view);
 			view.setModel(fishModel);
-
 			view.repaint();
+			
 		} else if (edgeDrawMode) {
 			drawingEdge.setX(e.getX());
 			drawingEdge.setY(e.getY());
