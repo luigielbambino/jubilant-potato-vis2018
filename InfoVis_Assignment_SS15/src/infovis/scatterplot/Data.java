@@ -2,6 +2,7 @@ package infovis.scatterplot;
 
 import java.awt.Color;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
@@ -10,6 +11,7 @@ import com.sun.org.apache.regexp.internal.recompile;
 
 public class Data{
 	private double [] values;
+	private double [][] XY;
 	private Color color = Color.BLACK;
 	private String label = "";
 	RectangularShape shape;
@@ -24,7 +26,9 @@ public class Data{
 	private double mass = 0;
 	private double acceleration = 0;
 
-	
+	private Line2D.Double lineData = new Line2D.Double(0, 0, 0, 0);
+	private Line2D.Double lineAttribute	= new Line2D.Double(0, 0, 0, 0);
+
 	public Data(double[] values, String label) {
 		super();
 		this.values = values;
@@ -65,6 +69,21 @@ public class Data{
 
 	public Data (double[] values) {
 		this.values = values;
+	}
+
+	public Data(int aID, double x1, double y1, double x2, double y2, String aName) {
+		super();
+		this.id = aID;
+		this.label = aName;
+		this.lineAttribute.setLine(x1, y1, x2, y2);	
+	}
+
+	public Data(double[][] values, int dataID, String label ) {
+		super();
+		this.label = label;
+		this.id = dataID;
+		this.XY = values;
+		this.setColor(Color.RED);
 	}
 
 	public String getLabel() {
@@ -161,6 +180,28 @@ public class Data{
 
 	public void setShape(RectangularShape shape) {
 		this.shape = shape;
+	}
+
+	public Line2D.Double getLine(){
+		
+		return this.lineAttribute;
+		
+	}
+
+	public void changeLine(double x1, double y1, double x2, double y2) {
+		this.lineAttribute.setLine(x1, y1, x2, y2);
+	}
+
+	public double[][] getXY() {
+		return XY;
+	}
+
+	public void setX (int index, double x) {
+		XY[index][0] = x;
+	}
+
+	public void setY(int index, double y) {
+		XY[index][1] = y;
 	}
 
 }
