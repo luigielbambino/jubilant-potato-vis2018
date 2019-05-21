@@ -19,12 +19,13 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	private int y = 0;
 	private int markerX = 0;
 	private int markerY = 0;
-	//private int initX = 0;
-	//private int initY = 0;
-	//private int currentX = 0;
-	//private int currentY = 0;
-	//private double mouseX  = 0;
-	//private double mouseY  = 0;
+
+	private int initX = 0;
+	private int initY = 0;
+	private int currentX = 0;
+	private int currentY = 0;
+	private double mouseX  = 0;
+	private double mouseY  = 0;
 
 	public void mouseClicked(MouseEvent arg0) {
 		view.setSelect(false);
