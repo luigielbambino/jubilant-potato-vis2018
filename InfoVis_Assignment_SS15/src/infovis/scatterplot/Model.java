@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import java.awt.geom.Rectangle2D;
+
 import javax.imageio.stream.FileImageInputStream;
 
 public class Model {
@@ -17,6 +19,7 @@ public class Model {
 	private ArrayList<Range> ranges = new ArrayList<Range>();
 	private ArrayList<String> labels = new ArrayList<String>();
 	private int dim = 0;
+	private static int idCounter = 0;
 	
 	public ArrayList<String> getLabels() {
 		return labels;
@@ -47,6 +50,10 @@ public class Model {
 	}
 	public void setDim(int dim) {
 		this.dim = dim;
+	}
+	public static int generateNewID() {
+		idCounter++;
+		return idCounter;
 	}
 	
 	

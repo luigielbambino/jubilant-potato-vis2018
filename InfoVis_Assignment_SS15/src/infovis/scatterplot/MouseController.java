@@ -1,5 +1,9 @@
 package infovis.scatterplot;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -10,19 +14,20 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	private View view = null;
 	private static final Data Null = null;
 	private Data scatter_data 	= null;
-	private ArrayList<Data> rectangleData  = new ArrayList<Data>();
+	private ArrayList<Data> rectangleDataPoints  = new ArrayList<Data>();
 	private int x = 0;
 	private int y = 0;
-	private markerX = 0;
-	private markerY = 0;
-	private initX = 0;
-	private initY = 0;
-	private currentX = 0;
-	private currentY = 0;
-	private double mouseX  = 0;
-	private double mouseY  = 0;
+	private int markerX = 0;
+	private int markerY = 0;
+	//private int initX = 0;
+	//private int initY = 0;
+	//private int currentX = 0;
+	//private int currentY = 0;
+	//private double mouseX  = 0;
+	//private double mouseY  = 0;
 
 	public void mouseClicked(MouseEvent arg0) {
+		view.setSelect(false);
 	}
 
 	public void mouseEntered(MouseEvent arg0) {
@@ -35,39 +40,41 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		//Iterator<Data> iter = model.iterator();
 		//view.getMarkerRectangle().setRect(x,y,w,h);
 		//view.repaint();
-		x = arg0.getX();
-		y = arg0.getY();
+		int x = arg0.getX();
+		int y = arg0.getY();
 		markerX = x;
 		markerY = y;
 
-		view.setMarkerPosition(x, y);
-		view.selectMouse(false);
+		view.setMarker(x, y);
+		view.setSelect(false);
 		view.repaint();
 	}
 
 	public void mouseReleased(MouseEvent arg0) {
-		view.markerDimension(0,0);
-		view.markerPosition(0,0);
+		view.setMarkerDimension(0,0);
+		view.setMarker(0,0);
 	}
 
 	public void mouseDragged(MouseEvent arg0) {
-		currentX = arg0.getX();
-		currentY = arg0.getY();
+		//currentX = arg0.getX();
+		//currentY = arg0.getY();
 		
+		int x = arg0.getX();
+		int y = arg0.getY();
 		int i = x - markerX;
 		int j = y - markerY;
 		
 		if(i < 0 && j < 0) {
-			view.setMarkerPosition(x, y);
+			view.setMarker(x, y);
 			int w = markerX - x;
 			int h = y - markerY;
 			view.setMarkerDimension(h, w);
 		}
 
 		if(i > 0 && j < 0) {
-			view.setMarkerPosition(markerX, y);
+			view.setMarker(markerX, y);
 			int w = x - markerX;
-			int h = markerY - y:
+			int h = markerY - y;
 			view.setMarkerDimension(h, w);
 		}
 
@@ -75,12 +82,13 @@ public class MouseController implements MouseListener, MouseMotionListener {
 			view.setMarkerDimension(j, i);
 		}
 
-		view.selectMouse(true);
+		view.setSelect(true);
 		rectangleDataPoints = get2Position();
+
 		if(rectangleDataPoints != null) {
-			System.out.println("")
+			System.out.println("");
 			for (Data rectangleData: rectangleDataPoints) {
-				ArrayList<Data> startData = view.updateList();
+				ArrayList<Data> startData = view.newDataList();
 				for (Data newd : startData) {
 					if (newd.getLabel() == rectangleData.getLabel()) {
 						newd.setColor(Color.GREEN);
@@ -106,7 +114,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		return this.model;
 	}
 
-	private Data getPosition(){
+	private Data getPosition() {
 		Data startData = null;
 		Iterator<Data> iter = view.iterator();
 		while (iter.hasNext()) {	
@@ -114,7 +122,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		  double dx = data.getShape().getX();
 		  double dy = data.getShape().getY();
 		  
-		  if (view.getMarkerRectangle().contains(dx, dy)) {
+		  if(view.getMarkerRectangle().contains(dx, dy)) {
 			  startData = data;  
 		  }
 			
@@ -123,14 +131,14 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	}
 
 	private ArrayList<Data> get2Position(){
-	 	ArrayList<Data> startData = view.get_new_List();
+	 	ArrayList<Data> startData = view.newDataList();
 		ArrayList<Data> rectangleData  = new ArrayList<Data>();
 	 	
 		for (Data newd : startData) {
 			  double dx = newd.getShape().getX();
 			  double dy = newd.getShape().getY();
 
-			  if (view.getMarkerRectangle().contains(dx, dy)) {
+			  if(view.getMarkerRectangle().contains(dx, dy)) {
 				  rectangleData.add(newd);
 			  }
 		}
