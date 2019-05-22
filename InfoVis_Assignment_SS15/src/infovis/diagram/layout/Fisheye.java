@@ -32,7 +32,7 @@ public class Fisheye implements Layout{
 		double dNormX, dNormY, dMaxX, dMaxY, qNormX, qNormY; // normal  coordinates and distance from focus to border of the window
 		double pfyeX,pfyeY, gpx, gpy, sGeomX, sGeomY, qFishX, qFishY, sFishX, sFishY; // fisheye coordinates, 
 		
-		int d = 2; // distortion factor
+		int d = 5; // distortion factor
 		int ratio = 3;
 		
 		int windowWith = view.getWidth(); // Boundary in X

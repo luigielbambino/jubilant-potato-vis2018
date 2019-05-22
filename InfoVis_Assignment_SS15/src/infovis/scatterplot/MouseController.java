@@ -36,7 +36,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 
 	public void mouseExited(MouseEvent arg0) {
 	}
-
+	//Listener to when the mouse is pressed, the pointer's location will determine the coordinate of marker grid
 	public void mousePressed(MouseEvent arg0) {
 		//Iterator<Data> iter = model.iterator();
 		//view.getMarkerRectangle().setRect(x,y,w,h);
@@ -50,12 +50,12 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		view.setSelect(false);
 		view.repaint();
 	}
-
+	//Setting up the marker grid's dimension to 0,0 so it doesn't show
 	public void mouseReleased(MouseEvent arg0) {
 		view.setMarkerDimension(0,0);
 		view.setMarker(0,0);
 	}
-
+	//Function to when mouse is dragged and therefore will set the marker grid's area
 	public void mouseDragged(MouseEvent arg0) {
 		//currentX = arg0.getX();
 		//currentY = arg0.getY();
@@ -64,21 +64,28 @@ public class MouseController implements MouseListener, MouseMotionListener {
 		int y = arg0.getY();
 		int i = x - markerX;
 		int j = y - markerY;
-		
+		//Pointer at upper left
 		if(i < 0 && j < 0) {
 			view.setMarker(x, y);
 			int w = markerX - x;
-			int h = y - markerY;
+			int h = markerY - y;
 			view.setMarkerDimension(h, w);
 		}
-
+		//Pointer at lowe left
+		if(i < 0 && j > 0) {
+			view.setMarker(x, markerY);
+			int w = markerX - x;
+			int h = y - markerY;
+			view.setMarkerDimension(h,w);
+		}
+		//Pointer at upper right
 		if(i > 0 && j < 0) {
 			view.setMarker(markerX, y);
 			int w = x - markerX;
 			int h = markerY - y;
 			view.setMarkerDimension(h, w);
 		}
-
+		//Pointer at lower right
 		if(i > 0 && j > 0) {
 			view.setMarkerDimension(j, i);
 		}
@@ -114,7 +121,7 @@ public class MouseController implements MouseListener, MouseMotionListener {
 	public Model getModel() {
 		return this.model;
 	}
-
+	//Function to compute the position of mouse's pointer
 	private Data getPosition() {
 		Data startData = null;
 		Iterator<Data> iter = view.iterator();

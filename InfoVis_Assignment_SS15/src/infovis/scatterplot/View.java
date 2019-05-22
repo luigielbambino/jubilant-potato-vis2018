@@ -44,20 +44,23 @@ public class View extends JPanel {
 			rectangle.setRect(100, 0 , dimension * 100, dimension * 100);
 			g2D.draw(rectangle);
 			
+			//Setting up the mouse marker (rectangle area)
+			//The x and y coordinates are defined by mouseX and mouseY to markerWidth and markerHeight
+			//The marker's grid color is also defined here
 			markerRectangle.setRect(mouseX, mouseY, markerWidth, markerHeight);
 			Color color = Color.GRAY;
 			Color c = null;
 			g2D.setColor(c);
 			g2D.draw(markerRectangle);
-
+			//Meant to be the measurement to draw the labels from the grid
 			int rx = 0, ry = 0;
 			int cx = 100, cy = 0;
-
+			//Get the labels of the chart
 	        for (String l : model.getLabels()) {
 				Debug.print(l);
 				Debug.print(",  ");
 				Debug.println("");
-
+				//Setting up the distance and color of labels from scatterplot chart
 				g2D.setColor(Color.BLACK);
 				rx += 100;
 				g2D.drawString(l, rx + 20, ry + 15);
@@ -84,12 +87,12 @@ public class View extends JPanel {
 			}
 			
 		}
-
+		//To get the marker grid's weight and height
 		public void setMarkerDimension(int h, int w) {
 			this.markerWidth = w;
 			this.markerHeight = h;
 		}
-
+		//To set the marker's position
 		public void setMarker (int x, int y) {
 			this.mouseX = x;
 			this.mouseY = y;
@@ -114,7 +117,7 @@ public class View extends JPanel {
 		public Iterator<Data> iterator() {
 			return newDataList.iterator();
 		}
-
+		//FUnction that works to compute new scatter whenever a new area/dimension of marker is set
 		public void newScatter() {
 			ArrayList <Range> range = model.getRanges();
 			sRectangle = new Rectangle2D.Double(0,0, 5, 5); 		
